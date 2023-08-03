@@ -29,15 +29,21 @@ app.post('/upload', upload.single('csvFile'), async (req, res) => {
     const existingFile = await DataModel.findOne({ filename });
     if (existingFile) {
       // File already exists, send a response indicating that the file exists
+      console.log('File already exists:', filename);
       res.status(200).json({ exists: true });
 
     } else {
       // File doesn't exist, proceed with saving the data to MongoDB
       const results = [];
+      let skipRows = 12; // Skip the first two rows of the CSV file
       fs.createReadStream(file.path)
-        .pipe(csvParser())
+        .pipe(csvParser({ skipLines: 8 })) // Set the separator to tab (assuming tab is the delimiter)
         .on('data', (row) => {
-          console.log("roww",row)
+          if (skipRows > 0) {
+            skipRows--;
+            return;
+          }
+          console.log('Row data:', row);
           results.push(row);
         })
         .on('end', async () => {

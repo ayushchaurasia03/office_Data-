@@ -52,7 +52,14 @@ exports.upload = async (req, res) => {
 
 exports.get =  async (req, res) => {
   try {
-    const allData = await DataModel.find({});
+    const filename = req.query.filename;
+    let query = {};
+
+    if (filename) {
+      query = { filename: { $regex: new RegExp(filename, 'i') } };
+    }
+
+    const allData = await DataModel.find(query);
     res.status(200).json(allData);
   } catch (err) {
     console.error('Error retrieving data from MongoDB:', err);

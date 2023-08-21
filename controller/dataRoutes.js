@@ -1,17 +1,13 @@
-const router = require("express").Router()
-
+const express = require('express');
 const multer = require('multer');
+const xlsx = require('xlsx');
+const attendanceController = require('../dataController/dataController');
 
-const dataindex = require("../dataController/dataController.js")
+const router = express.Router();
+const upload = multer();
 
+router.post('/upload', upload.single('file'), attendanceController.uploadAttendance);
+router.get('/collectionNames', attendanceController.getCollectionNames);
+router.get('/collectionData/:collectionName', attendanceController.getCollectionData);
 
-
-const upload = multer({ dest: 'tmp/csv/' });
-
-router.post('/upload', upload.single('csvFile'),dataindex.upload)
-router.post('/checkFile', upload.single('csvFile'),dataindex.check)
-router.get('/data', dataindex.get)
-router.get('/demo', dataindex.demo)
-
-
-module.exports = router
+module.exports = router;
